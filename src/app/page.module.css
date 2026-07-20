@@ -30,6 +30,10 @@
   padding: 120px 60px;
 }
 
+.container {
+  border: 1px solid #666 ;
+}
+
 .intro {
   display: flex;
   flex-direction: column;
