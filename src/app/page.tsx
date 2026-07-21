@@ -1,6 +1,8 @@
 import Image from "next/image";
 import styles from "./page.module.css";
 import lessonSequence from "@/data/lesson-sequence";
+import { getActionDistance } from "@/lib/replay/distance";
+import { clamp, lerp, smooth } from "@/lib/replay/math";
 
 export default function Home() {
 
@@ -40,9 +42,11 @@ export default function Home() {
   const visualActions = lessonSequence
       .filter((item) => item.action === 'shot')
       .map((shot) => {
-        const dx = shot.end[0] - shot.start[0]
-        const dy = shot.end[1] - shot.start[1]
-        const distance = Math.hypot(dx, dy)
+        // const dx = shot.end[0] - shot.start[0]
+        // const dy = shot.end[1] - shot.start[1]
+        // const distance = Math.hypot(dx, dy)
+
+        const distance = getActionDistance(shot)
         
         return {
           ...shot,
@@ -51,7 +55,13 @@ export default function Home() {
         }
       })
 
-      console.log(visualActions)
+      // console.log(visualActions)
+
+      // console.log(clamp(15, 20, 10))
+
+      // console.log(lerp(10, 20, clamp(1.5)))
+
+      console.log(smooth(2.0))
 
 
   return (
