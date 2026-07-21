@@ -3,6 +3,8 @@ import styles from "./page.module.css";
 import lessonSequence from "@/data/lesson-sequence";
 import { getActionDistance } from "@/lib/replay/distance";
 import { clamp, lerp, smooth } from "@/lib/replay/math";
+import { buildTimeline } from "@/lib/replay/timeline";
+import { getBeatState } from "@/lib/replay/timeline";
 
 export default function Home() {
 
@@ -61,7 +63,13 @@ export default function Home() {
 
       // console.log(lerp(10, 20, clamp(1.5)))
 
-      console.log(smooth(2.0))
+      // console.log(smooth(2.0))
+
+      // console.log(buildTimeline(lessonSequence))
+
+      const timeline = buildTimeline(lessonSequence)
+
+      console.log(getBeatState(timeline, 4.039))
 
 
   return (
