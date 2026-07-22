@@ -1,9 +1,11 @@
-import { clamp, smooth } from "./math"
+import { clamp, smooth, lerp } from "./math"
 
 type ActionInput = {
     duration: number;
+    start: number[];
+    end: number[];
 }
-
+// converts action durations into absolute replay times
 export function buildTimeline(
     actions: ActionInput[],
     settle = 0.4,
@@ -24,9 +26,8 @@ export function buildTimeline(
     })
 }
 
-
-type TimelineAction = {
-    duration: number,
+// & means TimelineAction contains everything from ActionInput and the timing properties.
+type TimelineAction = ActionInput & {
     startTime: number,
     endTime: number,
 }
@@ -55,7 +56,7 @@ export function getBeatState(
     const settleEnd = beat.endTime + settle;
 
     // Settling begins when the replay clock has passed the action’s endTime
-    const settling = time > beat.endTime && 
+    const settling = time >= beat.endTime && 
                      time < settleEnd
 
     // local action progress
@@ -69,6 +70,12 @@ export function getBeatState(
     // add smoothstep
     const easedProgress = smooth(progress)
 
+    // calculate ball start + end position with lerp
+    const position = [
+        lerp(beat.start[0], beat.end[0], easedProgress),
+        lerp(beat.start[1], beat.end[1], easedProgress),
+    ]
+
     return {
         index: safeIndex,
         beat,
@@ -76,5 +83,6 @@ export function getBeatState(
         elapsedTime,
         progress,
         easedProgress,
+        position,
     }
 }

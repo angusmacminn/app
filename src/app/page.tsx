@@ -69,7 +69,7 @@ export default function Home() {
 
       const timeline = buildTimeline(lessonSequence)
 
-      console.log(getBeatState(timeline, 4.039))
+      console.log(getBeatState(timeline, 0))
 
 
   return (
