@@ -1,7 +1,18 @@
+import type { Point } from "@/lib/replay/timeline";
+
+type LessonBeat = {
+  id: string;
+  player: string;
+  action: "carry" | "pass" | "shot";
+  recipient?: string;
+  start: Point;
+  end: Point;
+  duration: number;
+};
 
 // StatsBomb Open Data: Spain vs Germany, match 3942226.
 // These are the final three actions in Spain's 51' Dani Olmo goal sequence.
-const lessonSequence = [
+const lessonSequence: LessonBeat[] = [
   {
     id: "8404d957-5d26-4b67-8760-95ef4f47fd8a",
     player: "Lamine Yamal",

@@ -5,6 +5,8 @@ import { getActionDistance } from "@/lib/replay/distance";
 import { clamp, lerp, smooth } from "@/lib/replay/math";
 import { buildTimeline } from "@/lib/replay/timeline";
 import { getBeatState } from "@/lib/replay/timeline";
+import ReplayStage from "@/lib/replay/ReplayStage";
+import { pitchToWorld} from "@/lib/replay/coordinates";
 
 export default function Home() {
 
@@ -69,7 +71,8 @@ export default function Home() {
 
       const timeline = buildTimeline(lessonSequence)
 
-      console.log(getBeatState(timeline, 0))
+      // console.log(getBeatState(timeline, 0))
+      // console.log(pitchToWorld(60, 40))
 
 
   return (
@@ -79,9 +82,18 @@ export default function Home() {
           <div className={styles.hero}>
             <h1>Fixtures 360</h1>
           </div>
-          <h2>Replay Stage</h2>
-          <div className={styles.container}>
-            {
+        </section>
+
+        <section className={styles.pitchSection}>
+        <h2>Replay Stage</h2>
+          <div className={styles.pitchContainer}>
+            <ReplayStage />
+          </div>
+        </section>
+          
+
+        <section className={styles.section}>
+        {
               visualActions.map((shot) => {
                 const [dataStartX, dataStartY] = shot.start;
                 const [dataEndX, dataEndY] = shot.end;
@@ -109,12 +121,6 @@ export default function Home() {
                 
               })
             }
-            
-          </div>
-        </section>
-
-        <section className={styles.section}>
-          
         </section>
       
       </main>

@@ -1,9 +1,12 @@
 import { clamp, smooth, lerp } from "./math"
 
+export type Point = [number, number];
+
 type ActionInput = {
     duration: number;
-    start: number[];
-    end: number[];
+    start: Point;
+    end: Point;
+    action?: string;
 }
 // converts action durations into absolute replay times
 export function buildTimeline(
