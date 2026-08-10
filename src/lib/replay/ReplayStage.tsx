@@ -6,7 +6,9 @@ import { Canvas } from "@react-three/fiber"
 import { buildTimeline, getBeatState } from "./timeline"
 import { makePassCurve } from "./curves"
 import { Line } from "@react-three/drei";
-
+import Transport from "./transport"
+import Pitch from "./Pitch"
+import BallTrail from "./BallTrail"
 
 
 export default function ReplayStage(){
@@ -80,6 +82,10 @@ export default function ReplayStage(){
     const t = state.easedProgress
     const ballOnCurve = curve.getPoint(t)
 
+    // trail grows with progress
+    const drawnCount = Math.max(2, Math.floor(t * 32) + 1)
+    const drawnPoints = points.slice(0, drawnCount)
+
     return(
         <div style={{ width: "100%", height: "500px"}}>
             <Canvas
@@ -93,58 +99,27 @@ export default function ReplayStage(){
                 <pointLight position={[10, 10, 10]} intensity={1} />
 
                  {/* pitch mesh */}
-                <mesh rotation={[-Math.PI / 2, 0, 0]}>
-                    <planeGeometry args={[120, 80]} />
-                    <meshStandardMaterial color="green" />
-                </mesh>
+                <Pitch />
 
-                {/* pass curve */}
-                <Line 
-                    points={points}
-                    color="#f5d300"
-                    lineWidth={2}
-                    dashed
-                    dashSize={1.5}
-                    gapSize={1}
-                />
-
-                {/* shot START marker mesh */}
-                <mesh position={ballOnCurve}>
-                    <boxGeometry 
-                        args={[5, 5, 5]}
-                    />
-                    <meshStandardMaterial color="red"/>
-                </mesh>
-                
-                {/* current beat end (on the same curve) */}
-                <mesh position={curve.getPoint(1)}>
-                    <boxGeometry 
-                        args={[5, 5, 5]}
-                    />
-                    <meshStandardMaterial color="yellow"/>
-                </mesh>
-
+                 {/* ball trail / marker */}
+                <BallTrail 
+                    points={drawnPoints}
+                    ballPosition={ballOnCurve}
+                    endPosition={curve.getPoint(1)}
+                /> 
             </Canvas>
-            <button style={{ width: "50px", height: "50px"}} 
-                    onClick={() => {
-                        if (!playing && time >= 6.42) {
-                          setTime(0);
-                        }
-                        setPlaying((current) => !current);
-                      }}>
-                {playing ? "pause" : "play"}                        
-            </button>
-            <input
-                type="range"
-                min={0}
-                max={6.42}
-                step={0.01}
-                value={time}
-                onChange={(event) => {
-                  setTime(Number(event.target.value));
-                }}
+            <Transport 
+                time={time}
+                playing={playing}
+                maxTime={6.42}
+                onSeek={setTime}
+                onTogglePlay={() => {
+                    if (!playing && time >= 6.42) {
+                      setTime(0);
+                    }
+                    setPlaying((current) => !current);
+                  }}
             />
-            <span>{time.toFixed(2)}s</span>              
         </div>
     )
 }
