@@ -1,20 +1,29 @@
 "use client"
 import { useState, useEffect } from "react"
+import * as THREE from 'three'
 
 import lessonSequence from "@/data/lesson-sequence"
 import { Canvas } from "@react-three/fiber"
 import { buildTimeline, getBeatState } from "./timeline"
 import { makePassCurve } from "./curves"
-import { Line } from "@react-three/drei";
+import { OrbitControls } from "@react-three/drei";
 import Transport from "./transport"
 import Pitch from "./Pitch"
 import BallTrail from "./BallTrail"
+import CameraRig from "./CameraRig"
+
+
 
 
 export default function ReplayStage(){
 
     const [time, setTime] = useState(0)
     const [playing, setPlaying] = useState(false)
+
+    // Camera Modes
+    type CameraMode = "follow" | "tactical" | "orbit"    
+    const [cameraMode, setCameraMode] = useState<CameraMode>("follow")
+    
 
     useEffect(() => {
         // only run a clock while playing. pause = do nothing
@@ -86,15 +95,47 @@ export default function ReplayStage(){
     const drawnCount = Math.max(2, Math.floor(t * 32) + 1)
     const drawnPoints = points.slice(0, drawnCount)
 
+    // camera positions/offsets for each mode
+    const pitchCenter = new THREE.Vector3(0, 0, 0)
+    const followOffset = new THREE.Vector3(0, 60, 30)
+    const tacticalOffset = new THREE.Vector3(0, 100, 0)
+
+    const rigTarget =
+        cameraMode === 'tactical' ? pitchCenter : ballOnCurve
+    
+    const rigOffset = 
+        cameraMode === 'tactical' ? tacticalOffset : followOffset
+    
+    const rigEnabled = 
+        cameraMode === 'follow' || cameraMode === 'tactical'
+
+    const followActive = cameraMode === 'follow' && playing
+    const tacticalActive = cameraMode === 'tactical'
+    const OrbitActive = cameraMode === 'orbit'
+
     return(
         <div style={{ width: "100%", height: "500px"}}>
             <Canvas
                 camera={{ 
-                    position: [0, 100, 0],
-                    fov: 75,
-                    rotation: [-Math.PI / 2, 0, 0]
+                    position: [0, 40, 30],
+                    fov: 50,
+                    // rotation: [-Math.PI / 2, 0, 0]
                  }}
             >
+                <CameraRig 
+                    target={rigTarget} 
+                    offset={rigOffset}
+                    enabled={rigEnabled}    
+                />
+                {/* Keep target synced to the ball while following, so pause
+                    doesn't snap OrbitControls back to the world origin. */}
+                <OrbitControls
+                  makeDefault
+                  enabled={cameraMode === 'orbit'}
+                  target={ballOnCurve}
+                  enableDamping
+                />
+                
                 <ambientLight intensity={1} />
                 <pointLight position={[10, 10, 10]} intensity={1} />
 
@@ -120,6 +161,17 @@ export default function ReplayStage(){
                     setPlaying((current) => !current);
                   }}
             />
+            
+            <button type="button" onClick={ () => setCameraMode("follow")}>
+                Follow
+            </button>
+            <button type="button" onClick={() => setCameraMode("tactical")}>
+              Tactical
+            </button>
+            <button type="button" onClick={() => setCameraMode("orbit")}>
+              Orbit
+            </button>
+
         </div>
     )
 }
