@@ -73,7 +73,7 @@ export default function Pitch(){
         <>
         <mesh rotation={[-Math.PI / 2, 0, 0]}>
             <planeGeometry args={[120, 80]} />
-            <meshStandardMaterial color="green" />
+            <meshStandardMaterial color="#3f8f5a" />
         </mesh>
         {/* pitch bounds */}
          <Line 
@@ -84,31 +84,31 @@ export default function Pitch(){
         {/* halfwayline */}
         <Line 
             points={halfwayLine}
-            color="fff"
+            color="#fff"
             lineWidth={2}
         />
         {/* left penalty box */}
         <Line 
             points={leftPenaltyBox}
-            color="fff"
+            color="#fff"
             lineWidth={2}
         />
         {/* left 6 yd box */}
         <Line 
             points={leftSixYardBox}
-            color="fff"
+            color="#fff"
             lineWidth={2}
         />
         {/* right penalty box  */}
         <Line 
             points={rightPenaltyBox}
-            color="fff"
+            color="#fff"
             lineWidth={2}
         />
         {/* right 6 yd box */}
         <Line 
             points={rightSixYardBox}
-            color="fff"
+            color="#fff"
             lineWidth={2}
         />
         <Line points={centerCircle} color="#fff" lineWidth={2} />

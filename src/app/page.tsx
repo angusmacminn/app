@@ -1,128 +1,29 @@
-import Image from "next/image";
 import styles from "./page.module.css";
-import lessonSequence from "@/data/lesson-sequence";
-import { getActionDistance } from "@/lib/replay/distance";
-import { clamp, lerp, smooth } from "@/lib/replay/math";
-import { buildTimeline } from "@/lib/replay/timeline";
-import { getBeatState } from "@/lib/replay/timeline";
 import ReplayStage from "@/lib/replay/ReplayStage";
-import { pitchToWorld} from "@/lib/replay/coordinates";
 
 export default function Home() {
-
-  // extract only passes
-  const passes = lessonSequence.filter((item) => item.action === 'pass');
-  // console.log(passes);
-
-  // create pass labels for each pass
-  const passLabels = passes.map((pass) => {
-    return (
-      `${pass.player} -> ${pass.recipient}`
-    )
-  })
-  // console.log(passLabels)
-
-  // use reduce to get the total duration of the beat
-  const totalDuration = lessonSequence.reduce((total, action) => {
-    return total + action.duration }, 0)
-  // console.log(totalDuration)
-
-  // extract only shots
-  const shot = lessonSequence.filter((item) => item.action === 'shot')
-  // console.log(shot)
-
-  // calculate shot distance by iterating over shots, and for each take the start/end coords and use pythagorean formula
-  const shotDistance = shot.map((shot) => {
-    const dx = shot.end[0] - shot.start[0]
-    const dy = shot.end[1] - shot.start[1]
-
-    return Math.hypot(dx, dy);
-  })
-
-  // console.log(shotDistance)
-
-
-  // visual actions
-  const visualActions = lessonSequence
-      .filter((item) => item.action === 'shot')
-      .map((shot) => {
-        // const dx = shot.end[0] - shot.start[0]
-        // const dy = shot.end[1] - shot.start[1]
-        // const distance = Math.hypot(dx, dy)
-
-        const distance = getActionDistance(shot)
-        
-        return {
-          ...shot,
-          distance,
-          curveHeight: distance * 1.5
-        }
-      })
-
-      // console.log(visualActions)
-
-      // console.log(clamp(15, 20, 10))
-
-      // console.log(lerp(10, 20, clamp(1.5)))
-
-      // console.log(smooth(2.0))
-
-      // console.log(buildTimeline(lessonSequence))
-
-      const timeline = buildTimeline(lessonSequence)
-
-      // console.log(getBeatState(timeline, 0))
-      // console.log(pitchToWorld(60, 40))
-
-
   return (
     <div className={styles.page}>
       <main className={styles.main}>
-        <section className={styles.section}>
-          <div className={styles.hero}>
-            <h1>Fixtures 360</h1>
+        <header className={styles.hero}>
+          <h1>Fixtures 360</h1>
+          <p>
+            Spain vs Germany — the 51′ sequence: Yamal carry, cutback, Olmo
+            finish. Scrub the clock, switch cameras, explore the freeze frames.
+          </p>
+          <div className={styles.meta}>
+            <span>Euro 2024</span>
+            <span>StatsBomb Open Data</span>
+            <span>Match 3942226</span>
           </div>
-        </section>
+        </header>
 
         <section className={styles.pitchSection}>
-        <h2>Replay Stage</h2>
+          <h2>Dani Olmo goal sequence</h2>
           <div className={styles.pitchContainer}>
             <ReplayStage />
           </div>
         </section>
-          
-
-        <section className={styles.section}>
-        {
-              visualActions.map((shot) => {
-                const [dataStartX, dataStartY] = shot.start;
-                const [dataEndX, dataEndY] = shot.end;
-                const scale = 1;
-
-                const startX = dataStartX * scale;
-                const startY = dataStartY * scale;
-                const endX = dataEndX * scale;
-                const endY = dataEndY * scale;
-
-                const controlX = (startX + endX) / 2;
-                const controlY = (startY + endY) / 2 - shot.curveHeight;
-
-                return(
-                  <svg key={shot.id} viewBox="0 0 200 100">
-                    <path
-                    d={`M ${startX} ${startY} 
-                        Q ${controlX} ${controlY} 
-                        ${endX} ${endY}`}
-                    fill="none"
-                    stroke="red"
-                    />
-                  </svg>
-                )
-                
-              })
-            }
-        </section>
-      
       </main>
     </div>
   );

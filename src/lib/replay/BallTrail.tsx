@@ -18,17 +18,17 @@ export default function BallTrail({
         {/* shot START marker mesh */}
         <mesh position={ballPosition}>
                 <boxGeometry 
-                    args={[5, 5, 5]}
+                    args={[2, 2, 2]}
                 />
-                <meshStandardMaterial color="red"/>
+                <meshStandardMaterial color="#f5d300"/>
         </mesh>
                 
         {/* current beat end (on the same curve) */}
         <mesh position={endPosition}>
             <boxGeometry 
-                args={[5, 5, 5]}
+                args={[2, 2, 2]}
             />
-            <meshStandardMaterial color="yellow"/>
+            <meshStandardMaterial color="#ffffff"/>
         </mesh>
         {/* pass curve */}
         <Line 
