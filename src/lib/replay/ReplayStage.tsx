@@ -95,6 +95,7 @@ export default function ReplayStage() {
             fov: 50,
           }}
           style={{ width: "100%", height: "100%", background: "#dfe8e2" }}
+          dpr={[1, 2]}
         >
           <CameraRig
             target={rigTarget}
