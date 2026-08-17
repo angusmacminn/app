@@ -28,8 +28,14 @@ export default function BallTrail({
         if(!mesh) return
 
         for(let i = 0; i < points.length; i++){
+            // have particles grow large in the middle of the trail
+            const u = points.length === 1 ? 0.5 : i / (points.length -1)
+            const envelope = Math.sin(u * Math.PI)
+            const scale = 0.25 + 0.9 * envelope // min - max
+
             dummy.position.copy(points[i])
-            dummy.scale.setScalar(1)
+            dummy.position.y += 0.3
+            dummy.scale.setScalar(scale)
             dummy.updateMatrix()
             mesh.setMatrixAt(i, dummy.matrix)
         }
@@ -49,12 +55,12 @@ export default function BallTrail({
         </mesh>
                 
         {/* current beat end (on the same curve) */}
-        <mesh position={endPosition}>
+        {/* <mesh position={endPosition}>
             <boxGeometry 
                 args={[2, 2, 2]}
             />
             <meshStandardMaterial color="#ffffff"/>
-        </mesh>
+        </mesh> */}
         {/* pass curve */}
         <instancedMesh ref={meshRef} args={[undefined, undefined, MAX_COUNT]}>
             <sphereGeometry args={[0.4, 8, 8]} />

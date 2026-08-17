@@ -22,6 +22,22 @@ export default function ReplayStage() {
   const [playing, setPlaying] = useState(false);
   const [cameraMode, setCameraMode] = useState<CameraMode>("follow");
 
+
+  // pause when tab not active (event name must be all-lowercase)
+  useEffect(() => {
+    const onVisibility = () => {
+      if (document.hidden) {
+        setPlaying(false);
+      }
+    };
+
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, []);
+
+  // Clock
   useEffect(() => {
     if (!playing) return;
 
@@ -29,7 +45,9 @@ export default function ReplayStage() {
     let lastTime = performance.now();
 
     const tick = (now: number) => {
-      const deltaSeconds = (now - lastTime) / 1000;
+      // Cap delta so a background→foreground resume can't skip the whole clip
+      // if visibility pause is late by one frame.
+      const deltaSeconds = Math.min((now - lastTime) / 1000, 0.1);
       lastTime = now;
 
       setTime((current) => {
@@ -95,7 +113,7 @@ export default function ReplayStage() {
             fov: 50,
           }}
           style={{ width: "100%", height: "100%", background: "#dfe8e2" }}
-          dpr={[1, 2]}
+          dpr={[1, 1.5]}
         >
           <CameraRig
             target={rigTarget}
