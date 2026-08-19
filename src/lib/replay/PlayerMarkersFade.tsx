@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
-import type { FreezePlayer } from "./freezeframe";
+import { withCarrierOnBall, type FreezePlayer } from "./freezeframe";
 import PlayerMarkers from "./PlayerMarkers";
 
 const FADE_SECONDS = 0.4;
@@ -11,13 +11,15 @@ type Props = {
   players: FreezePlayer[];
   /** FreezeFrame.time — changes when the active freeze switches */
   frameTime: number;
+  carrierId: string | null;
+  carrierPitchPos: [number, number] | null
 };
 
 /**
  * Crossfades player markers when the active freeze frame changes.
  * No identity matching — old set fades out, new set fades in.
  */
-export default function PlayerMarkersFade({ players, frameTime }: Props) {
+export default function PlayerMarkersFade({ players, frameTime, carrierId, carrierPitchPos }: Props) {
   const [displayPlayers, setDisplayPlayers] = useState(players);
   const [outgoingPlayers, setOutgoingPlayers] = useState<FreezePlayer[]>([]);
   const [fade, setFade] = useState(1);
@@ -69,13 +71,17 @@ export default function PlayerMarkersFade({ players, frameTime }: Props) {
 
   const isFading = outgoingPlayers.length > 0;
 
+  const drawnDisplay = withCarrierOnBall(displayPlayers, carrierId, carrierPitchPos)
+  const drawnOutgoing = withCarrierOnBall(outgoingPlayers, carrierId, carrierPitchPos)
+
   return (
     <>
+      
       {isFading && (
-        <PlayerMarkers players={outgoingPlayers} opacity={1 - fade} />
+        <PlayerMarkers players={drawnOutgoing} opacity={1 - fade} />
       )}
       <PlayerMarkers
-        players={displayPlayers}
+        players={drawnDisplay}
         opacity={isFading ? fade : 1}
       />
     </>

@@ -12,6 +12,7 @@ import Pitch from "./Pitch";
 import BallTrail from "./BallTrail";
 import CameraRig from "./CameraRig";
 import { getFreezeFrame } from "./freezeframe";
+import { worldToPitch } from "./coordinates";
 import PlayerMarkersFade from "./PlayerMarkersFade";
 import styles from "./ReplayStage.module.css";
 
@@ -79,7 +80,7 @@ export default function ReplayStage() {
     state.beat.action === "shot"
       ? 0.05
       : state.beat.action === "carry"
-        ? 0
+        ? 0.2
         : 0.12;
 
   const curve = makePassCurve(state.beat.start, state.beat.end, curveHeight);
@@ -91,6 +92,14 @@ export default function ReplayStage() {
   const drawnCount = Math.max(2, Math.floor(t * 32) + 1);
   const drawnPoints = points.slice(0, drawnCount);
 
+  // if carry, have player move with the ball (same curve as ballOnCurve)
+  const carrierId = state.beat.action === "carry" ? "yamal" : null;
+  const carrierPitchPos =
+    state.beat.action === "carry"
+      ? worldToPitch(ballOnCurve.x, ballOnCurve.y, ballOnCurve.z)
+      : null;
+
+  // { CAMERA SETTINGS }
   const pitchCenter = new THREE.Vector3(0, 0, 0);
   const followOffset = new THREE.Vector3(0, 60, 30);
   const tacticalOffset = new THREE.Vector3(0, 100, 0);
@@ -140,6 +149,8 @@ export default function ReplayStage() {
           <PlayerMarkersFade
             players={framePlayers?.players ?? []}
             frameTime={framePlayers?.time ?? -1}
+            carrierId={carrierId}
+            carrierPitchPos={carrierPitchPos}
           />
         </Canvas>
       </div>
