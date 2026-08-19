@@ -12,7 +12,7 @@ import Pitch from "./Pitch";
 import BallTrail from "./BallTrail";
 import CameraRig from "./CameraRig";
 import { getFreezeFrame } from "./freezeframe";
-import PlayerMarkers from "./PlayerMarkers";
+import PlayerMarkersFade from "./PlayerMarkersFade";
 import styles from "./ReplayStage.module.css";
 
 type CameraMode = "follow" | "tactical" | "orbit";
@@ -93,7 +93,7 @@ export default function ReplayStage() {
 
   const pitchCenter = new THREE.Vector3(0, 0, 0);
   const followOffset = new THREE.Vector3(0, 60, 30);
-  const tacticalOffset = new THREE.Vector3(50, 130, 0);
+  const tacticalOffset = new THREE.Vector3(0, 100, 0);
 
   const rigTarget =
     cameraMode === "tactical" ? pitchCenter : ballOnCurve;
@@ -119,6 +119,7 @@ export default function ReplayStage() {
             target={rigTarget}
             offset={rigOffset}
             enabled={rigEnabled}
+            topDown={cameraMode === "tactical"}
           />
           <OrbitControls
             makeDefault
@@ -136,7 +137,10 @@ export default function ReplayStage() {
             ballPosition={ballOnCurve}
             endPosition={curve.getPoint(1)}
           />
-          <PlayerMarkers players={framePlayers?.players ?? []} />
+          <PlayerMarkersFade
+            players={framePlayers?.players ?? []}
+            frameTime={framePlayers?.time ?? -1}
+          />
         </Canvas>
       </div>
 

@@ -3,9 +3,10 @@ import { FreezePlayer } from "./freezeframe"
 
 type Props = {
     players: FreezePlayer[]
+    opacity?: number
 }
 
-export default function PlayerMarkers({ players}: Props){
+export default function PlayerMarkers({ players, opacity = 1 }: Props){
 
     return (
         <>
@@ -17,6 +18,9 @@ export default function PlayerMarkers({ players}: Props){
                     <boxGeometry args={[2, 2, 2]} />
                     <meshStandardMaterial 
                         color={player.team === "home" ? "#e10600" : "#1d4ed8"}
+                        transparent = {true}
+                        opacity={opacity}
+                         
                     />
                 </mesh>
             )
