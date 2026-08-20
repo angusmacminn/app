@@ -46,12 +46,12 @@ export default function BallTrail({
 
     return(
         <>
-        {/* shot START marker mesh */}
-        <mesh position={ballPosition}>
+        {/* Ball sits above player markers so carries don't z-fight */}
+        <mesh position={[ballPosition.x, ballPosition.y + 1.5, ballPosition.z]}>
                 <boxGeometry 
-                    args={[2, 2, 2]}
+                    args={[1, 1, 1]}
                 />
-                <meshStandardMaterial color="#f5d300"/>
+                <meshStandardMaterial color="#ffe943"/>
         </mesh>
                 
         {/* current beat end (on the same curve) */}
@@ -64,7 +64,7 @@ export default function BallTrail({
         {/* pass curve */}
         <instancedMesh ref={meshRef} args={[undefined, undefined, MAX_COUNT]}>
             <sphereGeometry args={[0.4, 8, 8]} />
-            <meshStandardMaterial color={"#f5d300"}/>
+            <meshStandardMaterial color={"#ffe943"}/>
         </instancedMesh>
         
         </>

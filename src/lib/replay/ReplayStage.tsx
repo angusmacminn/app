@@ -102,7 +102,7 @@ export default function ReplayStage() {
   // { CAMERA SETTINGS }
   const pitchCenter = new THREE.Vector3(0, 0, 0);
   const followOffset = new THREE.Vector3(0, 60, 30);
-  const tacticalOffset = new THREE.Vector3(0, 100, 0);
+  const tacticalOffset = new THREE.Vector3(0, 90, 0);
 
   const rigTarget =
     cameraMode === "tactical" ? pitchCenter : ballOnCurve;
@@ -121,7 +121,7 @@ export default function ReplayStage() {
             position: [0, 40, 30],
             fov: 50,
           }}
-          style={{ width: "100%", height: "100%", background: "#dfe8e2" }}
+          style={{ width: "100%", height: "100%", background: "#d8ffbf" }}
           dpr={[1, 1.5]}
         >
           <CameraRig

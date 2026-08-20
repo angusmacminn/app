@@ -6,20 +6,21 @@ export default function Home() {
     <div className={styles.page}>
       <main className={styles.main}>
         <header className={styles.hero}>
-          <h1>Fixtures 360</h1>
-          <p>
-            Spain vs Germany — the 51′ sequence: Yamal carry, cutback, Olmo
-            finish. Scrub the clock, switch cameras, explore the freeze frames.
-          </p>
+          <div>
+            <h1>Spain vs Germany</h1>
+            <p>Goal — Dani Olmo, 51′</p>
+          </div>
           <div className={styles.meta}>
             <span>Euro 2024</span>
-            <span>StatsBomb Open Data</span>
-            <span>Match 3942226</span>
+            {/* <span>StatsBomb 360</span> */}
+            {/* <span>Match 3942226</span> */}
           </div>
         </header>
 
         <section className={styles.pitchSection}>
-          <h2>Dani Olmo goal sequence</h2>
+          <div className={styles.sectionHeader}>
+            {/* <span>Scrub / Camera / Freeze Frames</span> */}
+          </div>
           <div className={styles.pitchContainer}>
             <ReplayStage />
           </div>

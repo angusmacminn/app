@@ -1,18 +1,23 @@
 :root {
-  --bg: #f3f6f4;
+  --bg: #ffffff;
   --bg-elevated: #ffffff;
-  --ink: #14201a;
-  --ink-muted: #5c6b63;
-  --line: #d5ddd8;
-  --accent: #1f6b45;
-  --accent-soft: #e4f0ea;
+  --ink: #080808;
+  --ink-muted: #3f3f3f;
+  --line: #111111;
+  --accent: var(--color-primary-gray);
+  --accent-soft: #eef2ff;
   --danger: #e10600;
   --away: #1d4ed8;
   --ball: #e6c200;
-  --shadow: 0 18px 40px rgba(20, 32, 26, 0.08);
-  --radius: 10px;
+  --color-primary-red: #ff4343;
+  --color-primary-yellow: #ffe943;
+  --color-primary-green: #69ff43;
+  --color-primary-blue: #4366ff;
+  --color-primary-gray: #d9d9d9;
+  --shadow: none;
+  --radius: 0;
   --font-display: var(--font-fraunces), Georgia, serif;
-  --font-body: var(--font-dm-sans), system-ui, sans-serif;
+  --font-body: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 html {
@@ -31,10 +36,7 @@ body {
   display: flex;
   flex-direction: column;
   color: var(--ink);
-  background:
-    radial-gradient(1200px 600px at 80% -10%, #dcece3 0%, transparent 55%),
-    radial-gradient(900px 500px at 0% 100%, #e7eef5 0%, transparent 50%),
-    var(--bg);
+  background: var(--bg);
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

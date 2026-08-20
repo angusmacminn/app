@@ -1,6 +1,8 @@
 import { pitchToWorld } from "./coordinates"
 import { Line } from "@react-three/drei";
 
+const PITCH_LINE_COLOR = "#171717"
+
 const boundary = [
     pitchToWorld(0, 0, 0.02),
     pitchToWorld(120, 0, 0.02),
@@ -73,46 +75,46 @@ export default function Pitch(){
         <>
         <mesh rotation={[-Math.PI / 2, 0, 0]}>
             <planeGeometry args={[120, 80]} />
-            <meshStandardMaterial color="#3f8f5a" />
+            <meshBasicMaterial color="#ffffff" />
         </mesh>
         {/* pitch bounds */}
          <Line 
          points={boundary}
-         color="#fff"
+         color={PITCH_LINE_COLOR}
          lineWidth={2}
         />
         {/* halfwayline */}
         <Line 
             points={halfwayLine}
-            color="#fff"
+            color={PITCH_LINE_COLOR}
             lineWidth={2}
         />
         {/* left penalty box */}
         <Line 
             points={leftPenaltyBox}
-            color="#fff"
+            color={PITCH_LINE_COLOR}
             lineWidth={2}
         />
         {/* left 6 yd box */}
         <Line 
             points={leftSixYardBox}
-            color="#fff"
+            color={PITCH_LINE_COLOR}
             lineWidth={2}
         />
         {/* right penalty box  */}
         <Line 
             points={rightPenaltyBox}
-            color="#fff"
+            color={PITCH_LINE_COLOR}
             lineWidth={2}
         />
         {/* right 6 yd box */}
         <Line 
             points={rightSixYardBox}
-            color="#fff"
+            color={PITCH_LINE_COLOR}
             lineWidth={2}
         />
-        <Line points={centerCircle} color="#fff" lineWidth={2} />
-        <Line points={centerSpot} color="#fff" lineWidth={2} />
+        <Line points={centerCircle} color={PITCH_LINE_COLOR} lineWidth={2} />
+        <Line points={centerSpot} color={PITCH_LINE_COLOR} lineWidth={2} />
     
      </>
     )
