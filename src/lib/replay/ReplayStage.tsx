@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import * as THREE from "three";
 
 import lessonSequence, { lessonFreezeFrames } from "@/data/lesson-sequence";
@@ -15,14 +15,49 @@ import { getFreezeFrame } from "./freezeframe";
 import { worldToPitch } from "./coordinates";
 import PlayerMarkersFade from "./PlayerMarkersFade";
 import styles from "./ReplayStage.module.css";
+import TuningPanel, { type ReplayTuningSettings } from "./TuningPanel";
 
 type CameraMode = "follow" | "tactical" | "orbit";
+
+const DEFAULT_TUNING: ReplayTuningSettings = {
+  durationScale: 1,
+  carryCurve: 0.2,
+  passCurve: 0.12,
+  shotCurve: 0.05,
+  trailSegments: 32,
+  trailMinScale: 0.25,
+  trailMaxScale: 1.15,
+  trailLift: 0.3,
+  ballLift: 1.5,
+  fadeSeconds: 0.4,
+  cameraLag: 1,
+  followHeight: 60,
+  followDepth: 30,
+  tacticalHeight: 90,
+};
 
 export default function ReplayStage() {
   const [time, setTime] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [cameraMode, setCameraMode] = useState<CameraMode>("follow");
+  const [tuning, setTuning] = useState(DEFAULT_TUNING);
 
+  const tunedSequence = useMemo(() => {
+    return lessonSequence.map((beat) => ({
+      ...beat,
+      duration: beat.duration * tuning.durationScale,
+    }));
+  }, [tuning.durationScale]);
+
+  const tunedFreezeFrames = useMemo(() => {
+    return lessonFreezeFrames.map((frame) => ({
+      ...frame,
+      time: frame.time * tuning.durationScale,
+    }));
+  }, [tuning.durationScale]);
+
+  const timeline = useMemo(() => buildTimeline(tunedSequence), [tunedSequence]);
+  const maxTime = timeline.at(-1)?.endTime ?? 0;
 
   // pause when tab not active (event name must be all-lowercase)
   useEffect(() => {
@@ -40,7 +75,7 @@ export default function ReplayStage() {
 
   // Clock
   useEffect(() => {
-    if (!playing) return;
+    if (!playing || maxTime === 0) return;
 
     let frameId = 0;
     let lastTime = performance.now();
@@ -53,9 +88,9 @@ export default function ReplayStage() {
 
       setTime((current) => {
         const next = current + deltaSeconds;
-        if (next >= 6.42) {
+        if (next >= maxTime) {
           setPlaying(false);
-          return 6.42;
+          return maxTime;
         }
         return next;
       });
@@ -68,28 +103,28 @@ export default function ReplayStage() {
     return () => {
       cancelAnimationFrame(frameId);
     };
-  }, [playing]);
+  }, [playing, maxTime]);
 
-  const timeline = buildTimeline(lessonSequence);
-  const state = getBeatState(timeline, time);
+  const replayTime = Math.min(time, maxTime);
+  const state = getBeatState(timeline, replayTime);
   if (!state) {
     return null;
   }
 
   const curveHeight =
     state.beat.action === "shot"
-      ? 0.05
+      ? tuning.shotCurve
       : state.beat.action === "carry"
-        ? 0.2
-        : 0.12;
+        ? tuning.carryCurve
+        : tuning.passCurve;
 
   const curve = makePassCurve(state.beat.start, state.beat.end, curveHeight);
-  const points = curve.getPoints(32);
+  const points = curve.getPoints(tuning.trailSegments);
 
   const t = state.easedProgress;
   const ballOnCurve = curve.getPoint(t);
 
-  const drawnCount = Math.max(2, Math.floor(t * 32) + 1);
+  const drawnCount = Math.max(2, Math.floor(t * tuning.trailSegments) + 1);
   const drawnPoints = points.slice(0, drawnCount);
 
   // if carry, have player move with the ball (same curve as ballOnCurve)
@@ -101,8 +136,8 @@ export default function ReplayStage() {
 
   // { CAMERA SETTINGS }
   const pitchCenter = new THREE.Vector3(0, 0, 0);
-  const followOffset = new THREE.Vector3(0, 60, 30);
-  const tacticalOffset = new THREE.Vector3(0, 90, 0);
+  const followOffset = new THREE.Vector3(0, tuning.followHeight, tuning.followDepth);
+  const tacticalOffset = new THREE.Vector3(0, tuning.tacticalHeight, 0);
 
   const rigTarget =
     cameraMode === "tactical" ? pitchCenter : ballOnCurve;
@@ -111,7 +146,7 @@ export default function ReplayStage() {
   const rigEnabled =
     cameraMode === "follow" || cameraMode === "tactical";
 
-  const framePlayers = getFreezeFrame(lessonFreezeFrames, time);
+  const framePlayers = getFreezeFrame(tunedFreezeFrames, replayTime);
 
   return (
     <div className={styles.stage}>
@@ -129,6 +164,7 @@ export default function ReplayStage() {
             offset={rigOffset}
             enabled={rigEnabled}
             topDown={cameraMode === "tactical"}
+            lag={tuning.cameraLag}
           />
           <OrbitControls
             makeDefault
@@ -145,30 +181,36 @@ export default function ReplayStage() {
             points={drawnPoints}
             ballPosition={ballOnCurve}
             endPosition={curve.getPoint(1)}
+            trailMinScale={tuning.trailMinScale}
+            trailMaxScale={tuning.trailMaxScale}
+            trailLift={tuning.trailLift}
+            ballLift={tuning.ballLift}
           />
           <PlayerMarkersFade
             players={framePlayers?.players ?? []}
             frameTime={framePlayers?.time ?? -1}
             carrierId={carrierId}
             carrierPitchPos={carrierPitchPos}
+            fadeSeconds={tuning.fadeSeconds}
           />
         </Canvas>
       </div>
 
       <Transport
-        time={time}
+        time={replayTime}
         playing={playing}
-        maxTime={6.42}
+        maxTime={maxTime}
         cameraMode={cameraMode}
         onSeek={setTime}
         onCameraModeChange={setCameraMode}
         onTogglePlay={() => {
-          if (!playing && time >= 6.42) {
+          if (!playing && replayTime >= maxTime) {
             setTime(0);
           }
           setPlaying((current) => !current);
         }}
       />
+      <TuningPanel settings={tuning} onChange={setTuning} />
     </div>
   );
 }

@@ -1,4 +1,3 @@
-import { Line } from "@react-three/drei";
 import { useRef, useLayoutEffect } from "react";
 import * as THREE from "three"
 
@@ -7,9 +6,13 @@ type BallTrailProps = {
   points: Vector3[];
   ballPosition: Vector3;
   endPosition: Vector3;
+  trailMinScale?: number;
+  trailMaxScale?: number;
+  trailLift?: number;
+  ballLift?: number;
 };
 
-const MAX_COUNT = 64 // longest points array
+const MAX_COUNT = 65 // getPoints(64) returns 65 points
 
 // one reuseable temp object - create once outside the component
 const dummy = new THREE.Object3D()
@@ -17,7 +20,10 @@ const dummy = new THREE.Object3D()
 export default function BallTrail({
     points,
     ballPosition,
-    endPosition,
+    trailMinScale = 0.25,
+    trailMaxScale = 1.15,
+    trailLift = 0.3,
+    ballLift = 1.5,
   }: BallTrailProps){
 
     // mesh ref
@@ -31,10 +37,10 @@ export default function BallTrail({
             // have particles grow large in the middle of the trail
             const u = points.length === 1 ? 0.5 : i / (points.length -1)
             const envelope = Math.sin(u * Math.PI)
-            const scale = 0.25 + 0.9 * envelope // min - max
+            const scale = trailMinScale + (trailMaxScale - trailMinScale) * envelope
 
             dummy.position.copy(points[i])
-            dummy.position.y += 0.3
+            dummy.position.y += trailLift
             dummy.scale.setScalar(scale)
             dummy.updateMatrix()
             mesh.setMatrixAt(i, dummy.matrix)
@@ -42,16 +48,16 @@ export default function BallTrail({
 
         mesh.count = points.length // only draw this many instances
         mesh.instanceMatrix.needsUpdate = true
-    }, [points]) // re run whenever the trail points change
+    }, [points, trailMinScale, trailMaxScale, trailLift]) // re run whenever trail shape changes
 
     return(
         <>
         {/* Ball sits above player markers so carries don't z-fight */}
-        <mesh position={[ballPosition.x, ballPosition.y + 1.5, ballPosition.z]}>
+        <mesh position={[ballPosition.x, ballPosition.y + ballLift, ballPosition.z]}>
                 <boxGeometry 
                     args={[1, 1, 1]}
                 />
-                <meshStandardMaterial color="#ffe943"/>
+                <meshBasicMaterial color="#69FF43" toneMapped={false}/>
         </mesh>
                 
         {/* current beat end (on the same curve) */}
@@ -61,10 +67,15 @@ export default function BallTrail({
             />
             <meshStandardMaterial color="#ffffff"/>
         </mesh> */}
-        {/* pass curve */}
-        <instancedMesh ref={meshRef} args={[undefined, undefined, MAX_COUNT]}>
+        {/* pass / shot trail */}
+        <instancedMesh frustumCulled={false} ref={meshRef} args={[undefined, undefined, MAX_COUNT]}>
             <sphereGeometry args={[0.4, 8, 8]} />
-            <meshStandardMaterial color={"#ffe943"}/>
+            <meshStandardMaterial
+  color="#ffe943"
+  emissive="#ffe943"
+  emissiveIntensity={0.8}
+  toneMapped={false}
+/>       
         </instancedMesh>
         
         </>
