@@ -1,5 +1,6 @@
 import { useRef, useLayoutEffect } from "react";
 import * as THREE from "three"
+import TrailRibbon from "./TrailRibbon";
 
 import type { Vector3 } from "three";
 type BallTrailProps = {
@@ -68,16 +69,18 @@ export default function BallTrail({
             <meshStandardMaterial color="#ffffff"/>
         </mesh> */}
         {/* pass / shot trail */}
-        <instancedMesh frustumCulled={false} ref={meshRef} args={[undefined, undefined, MAX_COUNT]}>
+        {/* <instancedMesh frustumCulled={false} ref={meshRef} args={[undefined, undefined, MAX_COUNT]}>
             <sphereGeometry args={[0.4, 8, 8]} />
             <meshStandardMaterial
-  color="#ffe943"
-  emissive="#ffe943"
-  emissiveIntensity={0.8}
-  toneMapped={false}
-/>       
-        </instancedMesh>
-        
+              color="#ffe943"
+              emissive="#ffe943"
+              emissiveIntensity={0.8}
+              toneMapped={false}
+            />       
+        </instancedMesh> */}
+
+        {/* shader trail */}
+        <TrailRibbon points={points} width={2.5} opacity={1}/>
         </>
     )
 }

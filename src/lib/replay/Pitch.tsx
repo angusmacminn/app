@@ -75,7 +75,7 @@ export default function Pitch(){
         <>
         <mesh rotation={[-Math.PI / 2, 0, 0]}>
             <planeGeometry args={[120, 80]} />
-            <meshBasicMaterial color="#ffffff" />
+            <meshBasicMaterial color="#ffffff" toneMapped={false} />
         </mesh>
         {/* pitch bounds */}
          <Line 

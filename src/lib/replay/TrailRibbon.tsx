@@ -65,6 +65,31 @@ function buildRibbonGeometry(points: Vector3[], width: number){
         return geometry;
     }
 
+    const vertexShader = `
+  varying vec2 vUv;
+
+  void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`;
+
+const fragmentShader = `
+  uniform vec3 uColor;
+  uniform float uOpacity;
+  varying vec2 vUv;
+
+  void main() {
+    float middle = sin(vUv.x * 3.14159265);
+    float edge = smoothstep(0.0, 0.35, vUv.y)
+               * (1.0 - smoothstep(0.65, 1.0, vUv.y));
+
+    float alpha = middle * edge * uOpacity;
+
+    gl_FragColor = vec4(uColor, alpha);
+  }
+`;
+
     export default function TrailRibbon({ points, width = 2, opacity = 1 }: RibbonProps) {
         const geometry = useMemo(() => {
           return buildRibbonGeometry(points, width);
@@ -76,13 +101,17 @@ function buildRibbonGeometry(points: Vector3[], width: number){
       
         return (
           <mesh geometry={geometry} frustumCulled={false}>
-            <meshBasicMaterial
-              color="#ffe943"
-              opacity={opacity}
-              transparent={opacity < 1}
-              side={THREE.DoubleSide}
-              toneMapped={false}
-            />
+            <shaderMaterial
+  vertexShader={vertexShader}
+  fragmentShader={fragmentShader}
+  uniforms={{
+    uColor: { value: new THREE.Color("#ffe943") },
+    uOpacity: { value: opacity },
+  }}
+  transparent
+  depthWrite={false}
+  side={THREE.DoubleSide}
+/>
           </mesh>
         );
       }
