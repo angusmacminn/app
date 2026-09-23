@@ -2,7 +2,6 @@
 import { useState, useEffect, useMemo } from "react";
 import * as THREE from "three";
 
-import lessonSequence, { lessonFreezeFrames } from "@/data/lesson-sequence";
 import { Canvas } from "@react-three/fiber";
 import { buildTimeline, getBeatState } from "./timeline";
 import { makePassCurve } from "./curves";
@@ -11,16 +10,16 @@ import Transport from "./transport";
 import Pitch from "./Pitch";
 import BallTrail from "./BallTrail";
 import CameraRig from "./CameraRig";
-import { getFreezeFrame } from "./freezeframe";
-import { worldToPitch } from "./coordinates";
+import { getFreezeFrame, type FreezeFrame } from "./freezeframe";import { worldToPitch } from "./coordinates";
 import PlayerMarkersFade from "./PlayerMarkersFade";
 import styles from "./ReplayStage.module.css";
 import TuningPanel, { type ReplayTuningSettings } from "./TuningPanel";
+import type { LessonBeat } from "@/data/lesson-sequence";
 
 type CameraMode = "follow" | "tactical" | "orbit";
 
 const DEFAULT_TUNING: ReplayTuningSettings = {
-  durationScale: 1,
+  durationScale: 0.5,
   carryCurve: 0.2,
   passCurve: 0.12,
   shotCurve: 0.05,
@@ -29,32 +28,44 @@ const DEFAULT_TUNING: ReplayTuningSettings = {
   trailMaxScale: 1.15,
   trailLift: 0.3,
   ballLift: 1.5,
-  fadeSeconds: 0.4,
+  fadeSeconds: 0.2,
   cameraLag: 1,
   followHeight: 60,
   followDepth: 30,
   tacticalHeight: 90,
 };
 
-export default function ReplayStage() {
+type ReplayStageProps = {
+  momentId: string;
+  beats: LessonBeat[];
+  freezeFrames: FreezeFrame[]
+}
+
+
+
+export default function ReplayStage({
+  momentId,
+  beats,
+  freezeFrames
+}: ReplayStageProps) {
   const [time, setTime] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [cameraMode, setCameraMode] = useState<CameraMode>("follow");
   const [tuning, setTuning] = useState(DEFAULT_TUNING);
 
   const tunedSequence = useMemo(() => {
-    return lessonSequence.map((beat) => ({
+    return beats.map((beat) => ({
       ...beat,
       duration: beat.duration * tuning.durationScale,
     }));
-  }, [tuning.durationScale]);
+  }, [beats, tuning.durationScale]);
 
   const tunedFreezeFrames = useMemo(() => {
-    return lessonFreezeFrames.map((frame) => ({
+    return freezeFrames.map((frame) => ({
       ...frame,
       time: frame.time * tuning.durationScale,
     }));
-  }, [tuning.durationScale]);
+  }, [freezeFrames, tuning.durationScale]);
 
   const timeline = useMemo(() => buildTimeline(tunedSequence), [tunedSequence]);
   const maxTime = timeline.at(-1)?.endTime ?? 0;
@@ -147,6 +158,12 @@ export default function ReplayStage() {
     cameraMode === "follow" || cameraMode === "tactical";
 
   const framePlayers = getFreezeFrame(tunedFreezeFrames, replayTime);
+
+  useEffect(()=> {
+    setTime(0)
+    setPlaying(false)
+    setCameraMode("follow")
+  }, [momentId])
 
   return (
     <div className={styles.stage}>

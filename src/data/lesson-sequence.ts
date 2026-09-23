@@ -1,6 +1,7 @@
 import type { Point } from "@/lib/replay/timeline";
+import type { FreezeFrame } from "@/lib/replay/freezeframe";
 
-type LessonBeat = {
+export type LessonBeat = {
   id: string;
   player: string;
   action: "carry" | "pass" | "shot";
@@ -10,19 +11,7 @@ type LessonBeat = {
   duration: number;
 };
 
-type FreezePlayer = {
-  id: string;
-  name?: string;
-  team: "home" | "away";
-  /** Pitch coords, same space as beat start/end */
-  position: Point;
-};
 
-type FreezeFrame = {
-  /** Seconds on the shared replay clock */
-  time: number;
-  players: FreezePlayer[];
-};
 
 // StatsBomb Open Data: Spain vs Germany, match 3942226.
 // These are the final three actions in Spain's 51' Dani Olmo goal sequence.
