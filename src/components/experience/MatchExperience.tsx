@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { moments } from '@/data/moments'
 import ReplayView from './ReplayView'
+import MatchSelector from './MatchSelector'
 
 export default function MatchExperience(){
 
@@ -12,23 +13,17 @@ export default function MatchExperience(){
         (moment) => moment.id === selectedId
     )
 
+    if (selectedMoment?.status === "ready") {
+        return <ReplayView moment={selectedMoment} />;
+      }
+
 
     return(
-        <>
-        <div>
-            {moments.map((moment) => (
-                <button
-                    key={moment.id}
-                    disabled={moment.status === "coming-soon"}
-                    onClick={()=> setSelectedId(moment.id)}
-                >
-                    {moment.fixture}
-                </button>
-            ))}
-        </div>
-        {selectedMoment?.status === "ready" && (
-            <ReplayView moment={selectedMoment} />
-        )}    
-        </>
+    <>
+        <MatchSelector
+        moments={moments}
+        onSelect={setSelectedId}
+        />   
+    </>
     )
 }
