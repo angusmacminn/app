@@ -36,7 +36,6 @@ const DEFAULT_TUNING: ReplayTuningSettings = {
 };
 
 type ReplayStageProps = {
-  momentId: string;
   beats: LessonBeat[];
   freezeFrames: FreezeFrame[]
 }
@@ -44,7 +43,6 @@ type ReplayStageProps = {
 
 
 export default function ReplayStage({
-  momentId,
   beats,
   freezeFrames
 }: ReplayStageProps) {
@@ -159,12 +157,6 @@ export default function ReplayStage({
 
   const framePlayers = getFreezeFrame(tunedFreezeFrames, replayTime);
 
-  useEffect(()=> {
-    setTime(0)
-    setPlaying(false)
-    setCameraMode("follow")
-  }, [momentId])
-
   return (
     <div className={styles.stage}>
       <div className={styles.canvasWrap}>
@@ -227,7 +219,7 @@ export default function ReplayStage({
           setPlaying((current) => !current);
         }}
       />
-      <TuningPanel settings={tuning} onChange={setTuning} />
+      {/* <TuningPanel settings={tuning} onChange={setTuning} /> */}
     </div>
   );
 }

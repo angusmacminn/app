@@ -1,6 +1,7 @@
 import type { ReadyMoment } from "@/data/moments";
 import ReplayStage from "@/lib/replay/ReplayStage";
 import styles from "@/app/page.module.css";
+import { motion } from "motion/react";
 
 type ReplayViewProps = {
   moment: ReadyMoment;
@@ -23,11 +24,18 @@ export default function ReplayView({ moment }: ReplayViewProps) {
 
         <section className={styles.pitchSection}>
           <div className={styles.pitchContainer}>
-            <ReplayStage
-              momentId={moment.id}
-              beats={moment.replay.beats}
-              freezeFrames={moment.replay.freezeFrames}
-            />
+            <motion.div 
+              className={styles.pitchContainer}
+              layoutId="replay-frame"
+              aria-hidden="true"
+            >
+              <ReplayStage
+                key={moment.id}
+                beats={moment.replay.beats}
+                freezeFrames={moment.replay.freezeFrames}
+              />
+            </motion.div>
+            
           </div>
         </section>
       </main>
