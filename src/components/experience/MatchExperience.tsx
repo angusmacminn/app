@@ -23,7 +23,7 @@ export default function MatchExperience(){
     return(
     <>
     <LayoutGroup>
-        <AnimatePresence mode='sync' initial={false}>
+        <AnimatePresence mode='popLayout'>
             {selectedMoment?.status === 'ready' ? (
                 <motion.div
                     key="replay"
